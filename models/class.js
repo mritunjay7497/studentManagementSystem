@@ -79,4 +79,4 @@ async function deleteClass(className){
 }
 
 
-module.exports = {addClass,getClass,updateClass,deleteClass};
+module.exports = {addClass,getClass,updateClass,deleteClass,classModel};

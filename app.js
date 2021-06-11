@@ -1,7 +1,7 @@
 const app = require('express')();
 
 const instructorRoutes = require('./router/instructor');
-// const teacherRoutes = require('./router/teacher');
+const teacherRoutes = require('./router/teacher');
 // const studentRoutes = require('./router/student');
 
 
