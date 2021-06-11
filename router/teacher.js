@@ -3,7 +3,7 @@ const bodyparser = require('body-parser');
 
 const jsonparser = bodyparser.json();
 
-const {addStudent,getClasses,updateStudent,deleteStudent} = require('../models/student')
+const {addStudent,getClasses,updateClasses,deleteStudent} = require('../models/student')
 
 const teacherRoutes = express.Router();
 
@@ -27,8 +27,8 @@ teacherRoutes.get('/',jsonparser,(req,res)=>{
 })
 
 // update student details
-teacherRoutes.put('/',(req,res)=>{
-    const updatedStudent = updateStudent(req.body.name,req.body.newName,req.body.grade,req.body.rollNo)
+teacherRoutes.put('/',jsonparser,(req,res)=>{
+    const updatedStudent = updateClasses(req.body.roll,req.body.newName,req.body.newRoll,req.body.grade,req.body.className)
         .then((student) => res.send(`Following student was updated\n${student}`))
         .catch((err) => console.log(err));
 })

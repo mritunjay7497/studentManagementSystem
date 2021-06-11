@@ -9,9 +9,9 @@ const instructorRoute = express.Router();
 const jsonparser = bodyparser.json()
 
 // Route to get all class list added by an instructor
-instructorRoute.get('/',(req,res) => {
+instructorRoute.get('/',jsonparser,(req,res) => {
 
-    const classList = getClass()
+    const classList = getClass(req.body.insName)
         .then((classList) => {
             res.send(classList)
         })

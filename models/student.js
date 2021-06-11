@@ -30,11 +30,16 @@ const studentSchema = new mongoose.Schema({
         type: Number,
         required:true
     },
-    classID:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'classes',
-        required: false
-    }
+    classID:
+        [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'classes',
+                 required: false
+            }
+        ]
+        
+    
 })
 
 // student model based on above schema
@@ -63,19 +68,30 @@ async function getClasses(studentName,roll){
     const classesEnrolled = await studentModel.findOne({name:studentName,roll:roll})
 
     let classesID = classesEnrolled.classID
-    let classList = await classModel.findOne({_id:classesID}).select({instructorName:1,className:1})
+    let classList = await classModel.find({_id:classesID}).select({instructorName:1,className:1})
 
     return classList;
 }
 
 // Update the classes enrolled by an student
-async function updateClasses(studentName,roll,classDetail){
+async function updateClasses(roll,newName,newRoll,newGrade,classDetail){
 
-    let query = {name:studentName,roll:roll}
+    let query = {roll:roll};
+    let classes =  await  classModel.findOne({className:classDetail})  
+
+
     const updatedClass = await studentModel.findOneAndUpdate({
         query,
+
+        name:newName,
+        roll:newRoll,
+        grade:newGrade,
+        classID:  classes,
         
+        new:true
+
     })
+    return await updatedClass.save()
 }
 
-module.exports = {addStudent,getClasses};
+module.exports = {addStudent,getClasses,updateClasses};

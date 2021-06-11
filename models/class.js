@@ -52,8 +52,20 @@ async function addClass(insName,className){
 
 // get the list of all classes for an instructor
 async function getClass(insName){
-    const classList = classModel.find(insName).select('instructorName instructorID className classID -_id')
-    return classList
+
+    const classList = classModel.find({instructorName:insName}).select('instructorName instructorID className classID -_id')
+    // console.log(classList)
+
+    // classModel.find({instructorName: insName},(err,data) => {
+    //     if(err){
+    //         console.log(err)
+    //         return;
+    //     } else{
+    //         console.log(data);
+    //     }
+    // })
+    return classList;
+
 }
 
 // Update the class added by an instructor
