@@ -34,8 +34,8 @@ teacherRoutes.put('/',jsonparser,(req,res)=>{
 })
 
 // delete a student
-teacherRoutes.delete('/',(req,res) => {
-    const deletedStudent = deleteStudent(req.body.name)
+teacherRoutes.delete('/',jsonparser,(req,res) => {
+    const deletedStudent = deleteStudent(req.body.roll,req.body.className)
         .then((student) => res.send(`Student deleted\n${student}`))
         .catch((err) => console.log(err))
 })

@@ -30,7 +30,7 @@ const studentSchema = new mongoose.Schema({
         type: Number,
         required:true
     },
-    classID:
+    classes:
         [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -50,13 +50,13 @@ const studentModel = new mongoose.model('student',studentSchema);
 // Add a student
 async function addStudent(studentName,roll,grade,className){
 
-   let classes =  await  classModel.findOne({className:className})  
+   let classObject =  await  classModel.findOne({className:className})  
 
     const newStudent = new studentModel({
         name:studentName,
         roll:roll,
         grade: grade,
-        classID: classes
+        classes: classObject
         
     
 })
@@ -65,10 +65,18 @@ async function addStudent(studentName,roll,grade,className){
 
 // Get the classes enrolled for an student
 async function getClasses(studentName,roll){
-    const classesEnrolled = await studentModel.findOne({name:studentName,roll:roll})
 
-    let classesID = classesEnrolled.classID
-    let classList = await classModel.find({_id:classesID}).select({instructorName:1,className:1})
+    let classID = [];
+    let classList = [];
+
+    const classesEnrolled = await studentModel.find({name:studentName,roll:roll}).select({classes:1,_id:0})
+
+    classID = classesEnrolled[0].classes
+
+
+    for(let i=0; i<classID.length; i++){
+        classList.push(await classModel.find({_id:classID[i]}).select({instructorName:1,className:1}))
+    }
 
     return classList;
 }
@@ -77,7 +85,7 @@ async function getClasses(studentName,roll){
 async function updateClasses(roll,newName,newRoll,newGrade,classDetail){
 
     let query = {roll:roll};
-    let classes =  await  classModel.findOne({className:classDetail})  
+    let classObject =  await  classModel.findOne({className:classDetail})  
 
 
     const updatedClass = await studentModel.findOneAndUpdate({
@@ -86,12 +94,38 @@ async function updateClasses(roll,newName,newRoll,newGrade,classDetail){
         name:newName,
         roll:newRoll,
         grade:newGrade,
-        classID:  classes,
-        
+        $push: {classes:classObject},
+    
         new:true
 
     })
     return await updatedClass.save()
 }
 
-module.exports = {addStudent,getClasses,updateClasses};
+// Delete a student from a class
+async function deleteStudent(roll,classDetail){
+
+    // Get class object id
+    let deleteClassId = await classModel.find({className:classDetail}).select({_id:1})
+
+    deleteClassId =  deleteClassId[0]._id
+
+    const studentDetail = await studentModel.findOne({roll:roll})
+
+        .then((studentInfo) => {
+            let classes = studentInfo.classes;
+            let index = classes.indexOf(deleteClassId);
+            let updatedClasses = classes.splice(index,1);
+
+            studentInfo.classes = updatedClasses;
+            studentInfo.markModified('classes');
+
+            studentInfo.save();
+            return studentInfo;
+        })
+        .catch((err) => console.log(err));
+
+}
+    
+   
+module.exports = {addStudent,getClasses,updateClasses,deleteStudent};
