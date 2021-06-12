@@ -1,4 +1,4 @@
-// Student Model, to be consumed by teacher route
+// Student admission Model, to be consumed by teacher route
 
 const mongoose = require('mongoose');
 const {classModel} = require('../models/class')
@@ -43,7 +43,7 @@ const studentSchema = new mongoose.Schema({
 })
 
 // student model based on above schema
-const studentModel = new mongoose.model('student',studentSchema);
+const studentModel = new mongoose.model('Enrolled',studentSchema);
 
 
 // Database end points for crud on student collection, by teacher
@@ -94,7 +94,7 @@ async function getClasses(studentName,roll){
 
     } else 
         return "No such students found..."
-        
+
 }
 
 // Update the classes enrolled by an student

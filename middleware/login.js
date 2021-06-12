@@ -1,13 +1,13 @@
-// This middleware provides authentication function using JWT
+// This middleware provides login function using JWT
 
 const jwt = require('jsonwebtoken');
 const secret = process.env.secret;
 
-function aunthenticate(req,res,next){
+function login(req,res,next){
     const token = req.header('x-auth-token');
 
     if(!token){
-        return res.status(401).send("Access denied. Login with your credential")
+        return res.status(401).send("Access denied. Login with your credentials")
     };
 
     try{
@@ -19,4 +19,4 @@ function aunthenticate(req,res,next){
     }
 };
 
-module.exports = aunthenticate;
+module.exports = login;

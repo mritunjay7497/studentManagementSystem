@@ -1,17 +1,22 @@
 const express = require('express');
-const bodyparser = require('body-parser');
 
+const bodyparser = require('body-parser');
 const jsonparser = bodyparser.json();
 
+const {registerTeacher} = require('../models/registration');
 const {addStudent,getClasses,updateClasses,deleteStudent} = require('../models/student')
 
 const teacherRoutes = express.Router();
 
+// Regiatration end-point for teacher
+teacherRoutes.post('/signup',jsonparser,(req,res) => {
+    const teacher = registerTeacher(req.body.name,req.body.email,req.body.password)
+        .then((data) => res.header('x-auth-token',data.token).send(`Registration successful for ${data.teacherResponse}.\nPlease login.`))
+        .catch((err) => console.log(err))
+})
+
 // A teacher can do CRUD operation on student collection
 
-
-
-// CRUD for a student
 // Add a student
 teacherRoutes.post('/',jsonparser,(req,res)=>{
     const newStudent = addStudent(req.body.name,req.body.roll,req.body.grade,req.body.className)
