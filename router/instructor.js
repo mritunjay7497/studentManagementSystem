@@ -3,6 +3,7 @@ const bodyparser = require('body-parser');
 
 const {addClass,getClass,updateClass,deleteClass} = require('../models/class');
 const {registerInstructor} = require('../models/registration');
+const {instructorLogin} = require('../models/authentication');
 
 const instructorRoute = express.Router();
 
@@ -14,7 +15,16 @@ instructorRoute.post('/signup',jsonparser,(req,res) => {
     const instructor = registerInstructor(req.body.name,req.body.email,req.body.password)
         .then((data) => res.header('x-auth-token',data.token).send(`Registration successful for ${data.instructorResponse}.\nPlease login.`))
         .catch((err) => console.log(err))
-})
+});
+
+// Instructor login
+instructorRoute.post('/login',jsonparser,(req,res) => {
+    const validCreds = instructorLogin(req.body.email,req.body.password)
+    .then((data) => res.header('x-auth-token',data.token).redirect('/api/instructor/').send("Login successful"))
+    .catch((err) => console.log(err));
+});
+
+
 
 // Route to get all class list added by an instructor
 instructorRoute.get('/',jsonparser,(req,res) => {

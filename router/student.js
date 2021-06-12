@@ -6,16 +6,25 @@ const bodyparser = require('body-parser');
 const jsonparser = bodyparser.json();
 
 const {getClasses} = require('../models/student');
-const {studentRegistration} = require('../models/registration');
+const {registerStudent} = require('../models/registration');
+const {studentLogin} = require('../models/authentication');
 
 const studentRoute = express.Router();
 
 // Student registration
 studentRoute.post('/signup',jsonparser,(req,res) => {
-    const student = registerTeacher(req.body.name,req.body.email,req.body.password)
+    const student = registerStudent(req.body.name,req.body.email,req.body.password)
         .then((data) => res.header('x-auth-token',data.token).send(`Registration successful for ${data.studentResponse}.\nPlease login.`))
         .catch((err) => console.log(err))
-})
+});
+
+// Student login
+studentRoute.post('/login',jsonparser,(req,res) => {
+
+    const validCreds = studentLogin(req.body.email,req.body.password)
+        .then((data) => res.header('x-auth-token',data.token).redirect('/api/student/').send("Login successful"))
+        .catch((err) => console.log(err));
+});
 
 // Get the list of all the classes a student is enrolled in
 studentRoute.get('/',jsonparser,(req,res) => {

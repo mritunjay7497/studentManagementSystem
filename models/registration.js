@@ -218,4 +218,4 @@ async function registerStudent(name,email,password){
 };
 
 
-module.exports = {registerTeacher,registerInstructor,registerStudent};
+module.exports = {registerTeacher,registerInstructor,registerStudent,teacherModel,instructorModel,studentModel};
