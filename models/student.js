@@ -52,15 +52,25 @@ async function addStudent(studentName,roll,grade,className){
 
    let classObject =  await  classModel.findOne({className:className})  
 
-    const newStudent = new studentModel({
-        name:studentName,
-        roll:roll,
-        grade: grade,
-        classes: classObject
+    // check if the student exists
+    let isAdded = studentModel.findOne({name:studentName,roll:roll})
+
+    if(!isAdded){
+
+        const newStudent = new studentModel({
+            name:studentName,
+            roll:roll,
+            grade: grade,
+            classes: classObject
+            
         
-    
-})
-    return await newStudent.save();
+        })
+        return await newStudent.save();
+
+    } else
+        return "Student with given credential already exist. Try updating instead !!"
+
+
 }
 
 // Get the classes enrolled for an student
@@ -71,14 +81,20 @@ async function getClasses(studentName,roll){
 
     const classesEnrolled = await studentModel.find({name:studentName,roll:roll}).select({classes:1,_id:0})
 
-    classID = classesEnrolled[0].classes
+    if(classesEnrolled.length>0){
+
+        classID = classesEnrolled[0].classes
 
 
-    for(let i=0; i<classID.length; i++){
+        for(let i=0; i<classID.length; i++){
         classList.push(await classModel.find({_id:classID[i]}).select({instructorName:1,className:1}))
-    }
+        }
 
-    return classList;
+        return classList;
+
+    } else 
+        return "No such students found..."
+        
 }
 
 // Update the classes enrolled by an student
@@ -108,9 +124,11 @@ async function deleteStudent(roll,classDetail){
     // Get class object id
     let deleteClassId = await classModel.find({className:classDetail}).select({_id:1})
 
-    deleteClassId =  deleteClassId[0]._id
 
-    const studentDetail = await studentModel.findOne({roll:roll})
+    if(deleteClassId.length > 0){
+        deleteClassId =  deleteClassId[0]._id
+
+        const studentDetail = await studentModel.findOne({roll:roll})
 
         .then((studentInfo) => {
             let classes = studentInfo.classes;
@@ -124,6 +142,8 @@ async function deleteStudent(roll,classDetail){
             return studentInfo;
         })
         .catch((err) => console.log(err));
+    } else
+        return "No such class found..."
 
 }
     

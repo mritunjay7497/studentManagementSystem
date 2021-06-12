@@ -15,7 +15,7 @@ const teacherRoutes = express.Router();
 // Add a student
 teacherRoutes.post('/',jsonparser,(req,res)=>{
     const newStudent = addStudent(req.body.name,req.body.roll,req.body.grade,req.body.className)
-        .then((student) => res.send(`Following student was added\n${student}`))
+        .then((student) => res.send(`${student}`))
         .catch((err) => console.log(err));
 })
 
@@ -36,7 +36,7 @@ teacherRoutes.put('/',jsonparser,(req,res)=>{
 // delete a student
 teacherRoutes.delete('/',jsonparser,(req,res) => {
     const deletedStudent = deleteStudent(req.body.roll,req.body.className)
-        .then((student) => res.send(`Student deleted\n${student}`))
+        .then((student) => res.send(`${student}`))
         .catch((err) => console.log(err))
 })
 
