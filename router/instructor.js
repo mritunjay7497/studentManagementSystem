@@ -4,6 +4,8 @@ const bodyparser = require('body-parser');
 const {addClass,getClass,updateClass,deleteClass} = require('../models/class');
 const {registerInstructor} = require('../models/registration');
 const {instructorLogin} = require('../models/authentication');
+const {validateToken} = require('../middleware/validateToken');
+
 
 const instructorRoute = express.Router();
 
@@ -27,7 +29,7 @@ instructorRoute.post('/login',jsonparser,(req,res) => {
 
 
 // Route to get all class list added by an instructor
-instructorRoute.get('/',jsonparser,(req,res) => {
+instructorRoute.get('/',jsonparser,validateToken,(req,res) => {
 
     const classList = getClass(req.body.insName)
         .then((classList) => {
@@ -37,7 +39,7 @@ instructorRoute.get('/',jsonparser,(req,res) => {
 })
 
 // Route to add a new class by an instructor
-instructorRoute.post('/',jsonparser,(req,res) => {
+instructorRoute.post('/',jsonparser,validateToken,(req,res) => {
 
     const classes = addClass(req.body.insName,req.body.className)
         .then((classes) => res.send(`Class ${classes}\nadded successfully`))
@@ -45,7 +47,7 @@ instructorRoute.post('/',jsonparser,(req,res) => {
 })
 
 // Route to update an existing class by an instructor
-instructorRoute.put('/',jsonparser,(req,res)=>{
+instructorRoute.put('/',jsonparser,validateToken,(req,res)=>{
 
     const updatedClass = updateClass(req.body.className,req.body.updatedClassName)
         .then((newClass) => res.send(newClass))
@@ -53,7 +55,7 @@ instructorRoute.put('/',jsonparser,(req,res)=>{
 })
 
 // Route to delete an existing class by the instructor
-instructorRoute.delete('/',jsonparser,(req,res) => {
+instructorRoute.delete('/',jsonparser,validateToken,(req,res) => {
 
     const deletedClass = deleteClass(req.body.className)
         .then((data) => res.send(`class\n${data}\ndeleted successfully`))

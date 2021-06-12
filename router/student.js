@@ -8,6 +8,8 @@ const jsonparser = bodyparser.json();
 const {getClasses} = require('../models/student');
 const {registerStudent} = require('../models/registration');
 const {studentLogin} = require('../models/authentication');
+const {validateToken} = require('../middleware/validateToken');
+
 
 const studentRoute = express.Router();
 
@@ -27,7 +29,7 @@ studentRoute.post('/login',jsonparser,(req,res) => {
 });
 
 // Get the list of all the classes a student is enrolled in
-studentRoute.get('/',jsonparser,(req,res) => {
+studentRoute.get('/',jsonparser,validateToken,(req,res) => {
     const classList = getClasses(req.body.name,req.body.roll)
         .then((classes) => res.send(classes))
         .catch((err) => res.send(err));

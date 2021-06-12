@@ -3,7 +3,7 @@
 const jwt = require('jsonwebtoken');
 const secret = process.env.secret;
 
-function login(req,res,next){
+function validateToken(req,res,next){
     const token = req.header('x-auth-token');
 
     if(!token){
@@ -19,4 +19,4 @@ function login(req,res,next){
     }
 };
 
-module.exports = login;
+module.exports = validateToken;
