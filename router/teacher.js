@@ -8,6 +8,13 @@ const {teacherLogin} = require('..//models/authentication');
 const {addStudent,getClasses,updateClasses,deleteStudent} = require('../models/student');
 const validateToken = require('../middleware/validateToken');
 
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const secret = process.env.secret;
+
 const teacherRoutes = express.Router();
 
 // Regiatration end-point for teacher
@@ -44,7 +51,7 @@ teacherRoutes.get('/',jsonparser,validateToken,(req,res)=>{
 // update student details
 teacherRoutes.put('/',jsonparser,validateToken,(req,res)=>{
     const updatedStudent = updateClasses(req.body.roll,req.body.newName,req.body.newRoll,req.body.grade,req.body.className)
-        .then((student) => res.send(`Following student was updated\n${student}`))
+        .then((student) => res.send(`${student}`))
         .catch((err) => console.log(err));
 })
 

@@ -107,19 +107,28 @@ async function updateClasses(roll,newName,newRoll,newGrade,classDetail){
     let query = {roll:roll};
     let classObject =  await  classModel.findOne({className:classDetail})  
 
+    if(!classObject){
+        return "No such class exists."
+    }
+    else {
 
-    const updatedClass = await enrollModel.findOneAndUpdate({
-        query,
-
-        name:newName,
-        roll:newRoll,
-        grade:newGrade,
-        $push: {classes:classObject},
+        const updatedClass = await enrollModel.findOneAndUpdate({
+            query,
     
-        new:true
+            name:newName,
+            roll:newRoll,
+            grade:newGrade,
+            $push: {classes:classObject},
+        
+            new:true
+    
+        })
+        return await updatedClass.save()
+        
+    }
 
-    })
-    return await updatedClass.save()
+
+    
 }
 
 // Delete a student from a class
@@ -132,12 +141,13 @@ async function deleteStudent(roll,classDetail){
     if(deleteClassId.length > 0){
         deleteClassId =  deleteClassId[0]._id
 
-        const studentDetail = await studentModel.findOne({roll:roll})
+        const studentDetail = await enrollModel.findOne({roll:roll})
 
         .then((studentInfo) => {
             let classes = studentInfo.classes;
             let index = classes.indexOf(deleteClassId);
-            let updatedClasses = classes.splice(index,1);
+            classes.splice(index,1);
+            let updatedClasses = classes;
 
             studentInfo.classes = updatedClasses;
             studentInfo.markModified('classes');

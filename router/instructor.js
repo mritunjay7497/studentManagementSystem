@@ -5,7 +5,12 @@ const {addClass,getClass,updateClass,deleteClass} = require('../models/class');
 const {registerInstructor} = require('../models/registration');
 const {instructorLogin} = require('../models/authentication');
 const validateToken = require('../middleware/validateToken');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
+dotenv.config();
+
+const secret = process.env.secret;
 
 const instructorRoute = express.Router();
 
@@ -31,7 +36,11 @@ instructorRoute.post('/login',jsonparser,(req,res) => {
 // Route to get all class list added by an instructor
 instructorRoute.get('/',jsonparser,validateToken,(req,res) => {
 
-    const classList = getClass(req.body.insName)
+    const token = req.header('x-auth-token');
+    const payload  =  jwt.verify(token,secret);
+    const instructorName = payload.name;
+
+    const classList = getClass(instructorName)
         .then((classList) => res.send(classList))
         .catch((err) => console.log(err))
 })
@@ -39,7 +48,11 @@ instructorRoute.get('/',jsonparser,validateToken,(req,res) => {
 // Route to add a new class by an instructor
 instructorRoute.post('/',jsonparser,validateToken,(req,res) => {
 
-    const classes = addClass(req.body.insName,req.body.className)
+    const token = req.header('x-auth-token');
+    const payload  =  jwt.verify(token,secret);
+    const instructorName = payload.name;
+
+    const classes = addClass(instructorName,req.body.className)
         .then((classes) => res.send(`Class ${classes}\nadded successfully`))
         .catch((err) => console.log(err));
 })
