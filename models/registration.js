@@ -115,6 +115,17 @@ const instructorSchema = new mongoose.Schema({
     isInstructor: Boolean
 });
 
+instructorSchema.methods.getAuthToken = function(){
+    const token = jwt.sign({
+        _id: this.id,
+        name: this.name,
+        email: this.email,
+        isInstructor: this.isInstructor
+    }, secret);
+
+    return token;
+};
+
 // Initialize instructor model based on above schema
 const instructorModel = new mongoose.model('instructor',instructorSchema);
 

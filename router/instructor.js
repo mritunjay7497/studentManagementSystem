@@ -4,7 +4,7 @@ const bodyparser = require('body-parser');
 const {addClass,getClass,updateClass,deleteClass} = require('../models/class');
 const {registerInstructor} = require('../models/registration');
 const {instructorLogin} = require('../models/authentication');
-const {validateToken} = require('../middleware/validateToken');
+const validateToken = require('../middleware/validateToken');
 
 
 const instructorRoute = express.Router();
@@ -15,14 +15,14 @@ const jsonparser = bodyparser.json()
 // instructor registration
 instructorRoute.post('/signup',jsonparser,(req,res) => {
     const instructor = registerInstructor(req.body.name,req.body.email,req.body.password)
-        .then((data) => res.header('x-auth-token',data.token).send(`Registration successful for ${data.instructorResponse}.\nPlease login.`))
+        .then((data) => res.header('x-auth-token',data.token).send(`Registration successful for ${data.instructorResponse.name} with email ${data.instructorResponse.email}.\nPlease login.`))
         .catch((err) => console.log(err))
 });
 
 // Instructor login
 instructorRoute.post('/login',jsonparser,(req,res) => {
     const validCreds = instructorLogin(req.body.email,req.body.password)
-    .then((data) => res.header('x-auth-token',data.token).redirect('/api/instructor/').send("Login successful"))
+    .then((data) => res.header('x-auth-token',data.token).send("Login successful"))
     .catch((err) => console.log(err));
 });
 
@@ -32,9 +32,7 @@ instructorRoute.post('/login',jsonparser,(req,res) => {
 instructorRoute.get('/',jsonparser,validateToken,(req,res) => {
 
     const classList = getClass(req.body.insName)
-        .then((classList) => {
-            res.send(classList)
-        })
+        .then((classList) => res.send(classList))
         .catch((err) => console.log(err))
 })
 

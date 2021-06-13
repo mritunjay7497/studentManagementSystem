@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const {classModel} = require('../models/class')
+const {studentModel} = require('./registration')
 
 const dotenv = require('dotenv')
 dotenv.config()
@@ -12,8 +13,8 @@ mongoose.connect(dbURI,{ useNewUrlParser: true,useUnifiedTopology: true, useFind
     .then(() => console.log('connected to the student database'))
     .catch((err) => console.log(err))
 
-// Student Schema
-const studentSchema = new mongoose.Schema({
+// Student enrolled Schema
+const enrollSchema = new mongoose.Schema({
     name:{
         type:String,
         required:true,
@@ -30,45 +31,48 @@ const studentSchema = new mongoose.Schema({
         type: Number,
         required:true
     },
-    classes:
-        [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'classes',
-                 required: false
-            }
-        ]
-        
+   
+    classes:[
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'classes',
+                required: false
+        }
+    ]    
     
 })
 
 // student model based on above schema
-const studentModel = new mongoose.model('Enrolled',studentSchema);
+const enrollModel = new mongoose.model('Enroll',enrollSchema)
 
 
 // Database end points for crud on student collection, by teacher
 // Add a student
-async function addStudent(studentName,roll,grade,className){
+async function addStudent(studentName,roll,grade,className,email){
 
-   let classObject =  await  classModel.findOne({className:className})  
+    // check if class is added by instructor
+    let classObject =  await  classModel.findOne({className:className})  
 
-    // check if the student exists
-    let isAdded = studentModel.findOne({name:studentName,roll:roll})
+    // check if the student exists 
+    let isAvailable = await studentModel.findOne({name:studentName,email:email})
 
-    if(!isAdded){
+    // check if student is already enrolled
+    let isEnrolled = await enrollModel.findOne({name:studentName,roll:roll})
 
-        const newStudent = new studentModel({
+
+    if(isAvailable && classObject && !isEnrolled){
+
+        const enroll = new enrollModel({
             name:studentName,
             roll:roll,
             grade: grade,
-            classes: classObject
-            
-        
+            classes: classObject          
         })
-        return await newStudent.save();
-
-    } else
-        return "Student with given credential already exist. Try updating instead !!"
+        
+        return await enroll.save();
+    } 
+    else
+        return "Student with given credential already exist in the class. Try updating instead !!";
 
 
 }
@@ -79,7 +83,7 @@ async function getClasses(studentName,roll){
     let classID = [];
     let classList = [];
 
-    const classesEnrolled = await studentModel.find({name:studentName,roll:roll}).select({classes:1,_id:0})
+    const classesEnrolled = await enrollModel.find({name:studentName,roll:roll}).select({classes:1,_id:0})
 
     if(classesEnrolled.length>0){
 
@@ -104,7 +108,7 @@ async function updateClasses(roll,newName,newRoll,newGrade,classDetail){
     let classObject =  await  classModel.findOne({className:classDetail})  
 
 
-    const updatedClass = await studentModel.findOneAndUpdate({
+    const updatedClass = await enrollModel.findOneAndUpdate({
         query,
 
         name:newName,

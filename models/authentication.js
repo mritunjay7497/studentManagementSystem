@@ -16,7 +16,7 @@ const secret = process.env.secret;
 const dbURI = process.env.dbURI;
 
 // connect to the DB
-mongoose.connect(dburi, { useNewUrlParser: true,useUnifiedTopology: true, useFindAndModify: false })
+mongoose.connect(dbURI, { useNewUrlParser: true,useUnifiedTopology: true, useFindAndModify: false })
     .then(() => console.log("connected to the authentication database"))
     .catch((err) => console.log(err));
 

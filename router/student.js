@@ -8,7 +8,7 @@ const jsonparser = bodyparser.json();
 const {getClasses} = require('../models/student');
 const {registerStudent} = require('../models/registration');
 const {studentLogin} = require('../models/authentication');
-const {validateToken} = require('../middleware/validateToken');
+const validateToken = require('../middleware/validateToken');
 
 
 const studentRoute = express.Router();
@@ -16,7 +16,7 @@ const studentRoute = express.Router();
 // Student registration
 studentRoute.post('/signup',jsonparser,(req,res) => {
     const student = registerStudent(req.body.name,req.body.email,req.body.password)
-        .then((data) => res.header('x-auth-token',data.token).send(`Registration successful for ${data.studentResponse}.\nPlease login.`))
+        .then((data) => res.header('x-auth-token',data.token).send(`Registration successful for ${data.studentResponse.name} with email ${data.studentResponse.email}.\nPlease login.`))
         .catch((err) => console.log(err))
 });
 
@@ -24,7 +24,7 @@ studentRoute.post('/signup',jsonparser,(req,res) => {
 studentRoute.post('/login',jsonparser,(req,res) => {
 
     const validCreds = studentLogin(req.body.email,req.body.password)
-        .then((data) => res.header('x-auth-token',data.token).redirect('/api/student/').send("Login successful"))
+        .then((data) => res.header('x-auth-token',data.token).send("Login successful"))
         .catch((err) => console.log(err));
 });
 
