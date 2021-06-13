@@ -10,6 +10,12 @@ const {registerStudent} = require('../models/registration');
 const {studentLogin} = require('../models/authentication');
 const validateToken = require('../middleware/validateToken');
 
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const secret = process.env.secret;
 
 const studentRoute = express.Router();
 
@@ -29,8 +35,14 @@ studentRoute.post('/login',jsonparser,(req,res) => {
 });
 
 // Get the list of all the classes a student is enrolled in
+
 studentRoute.get('/',jsonparser,validateToken,(req,res) => {
-    const classList = getClasses(req.body.name,req.body.roll)
+    
+    const token = req.header('x-auth-token');
+    const payload  =  jwt.verify(token,secret);
+    const studentName = payload.name;
+
+    const classList = getClasses(studentName,req.body.roll)
         .then((classes) => res.send(classes))
         .catch((err) => res.send(err));
 })
